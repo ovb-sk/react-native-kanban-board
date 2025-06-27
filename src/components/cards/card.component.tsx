@@ -111,11 +111,11 @@ class Card<T> extends Component<Props<T>> {
   }
 }
 
+const WrappedCard = withKanbanContext(Card as any);
 // Create a generic wrapper function that preserves the type
 function CardWithContext<T>(
   props: CardExternalProps<T> & { model: CardModel<T>; hidden: boolean }
 ) {
-  const WrappedCard = withKanbanContext(Card as any);
   return React.createElement(WrappedCard, props);
 }
 
