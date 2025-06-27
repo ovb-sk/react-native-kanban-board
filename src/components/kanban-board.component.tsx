@@ -683,11 +683,13 @@ const styles = StyleSheet.create({
   },
 });
 
+// Create the HOC-wrapped component outside the function to avoid re-creation on every render
+const WrappedKanbanBoard = withKanbanContext(
+  ReactTimeout(KanbanBoard) as any
+);
+
 // Create a generic wrapper function that preserves the type
 function KanbanBoardWithContext<T>(props: KanbanBoardProps<T>) {
-  const WrappedKanbanBoard = withKanbanContext(
-    ReactTimeout(KanbanBoard) as any
-  );
   return React.createElement(WrappedKanbanBoard, props);
 }
 
