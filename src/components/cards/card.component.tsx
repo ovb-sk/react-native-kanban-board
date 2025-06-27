@@ -1,31 +1,31 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
 import {
-  TouchableOpacity,
   StyleProp,
   StyleSheet,
   Text,
+  TextStyle,
+  TouchableOpacity,
   View,
   ViewStyle,
-  TextStyle
-} from 'react-native';
+} from "react-native";
 
-import { CardModel } from '../../models/card-model';
-import { Tags } from './tags.component';
-import { KanbanContext, withKanbanContext } from '../kanban-context.provider';
+import { CardModel } from "../../models/card-model";
+import { KanbanContext, withKanbanContext } from "../kanban-context.provider";
+import { Tags } from "./tags.component";
 
-export type CardExternalProps = {
+export type CardExternalProps<T> = {
   /**
    * Callback function invoked when the card is pressed.
    * @param {CardModel} model - The card model representing the pressed card.
    */
-  onCardPress?: (model: CardModel) => void;
+  onCardPress?: (model: CardModel<T>) => void;
 
   /**
    * Function that renders the content of the card.
    * @param {CardModel} model - The card model to render the content for.
    * @returns {JSX.Element | null} - The JSX element representing the card content, or null to render the default content.
    */
-  renderCardContent?(model: CardModel): JSX.Element | null;
+  renderCardContent?(model: CardModel<T>): JSX.Element | null;
 
   /**
    * Custom style for the card container.
@@ -46,27 +46,24 @@ export type CardExternalProps = {
    * Custom style for the card content text.
    */
   cardContentTextStyle?: StyleProp<TextStyle>;
-}
+};
 
-type Props = CardExternalProps &
+type Props<T> = CardExternalProps<T> &
   KanbanContext & {
-    model: CardModel;
+    model: CardModel<T>;
     hidden: boolean;
   };
 
-class Card extends Component<Props> {
+class Card<T> extends Component<Props<T>> {
   onPress = () => {
-    const {
-      onCardPress,
-      model
-    } = this.props;
+    const { onCardPress, model } = this.props;
 
     if (!onCardPress) {
       return;
     }
 
     onCardPress(model);
-  }
+  };
 
   render() {
     const {
@@ -76,64 +73,78 @@ class Card extends Component<Props> {
       cardContainerStyle,
       cardTitleTextStyle,
       cardSubtitleTextStyle,
-      cardContentTextStyle
+      cardContentTextStyle,
     } = this.props;
 
     return (
-      <View style={[styles.container, cardContainerStyle, hidden && { opacity: 0 }]}>
-        <TouchableOpacity
-          onPress={this.onPress}>
-          {renderCardContent &&
-            renderCardContent(model)}
+      <View
+        style={[styles.container, cardContainerStyle, hidden && { opacity: 0 }]}
+      >
+        <TouchableOpacity onPress={this.onPress}>
+          {renderCardContent && renderCardContent(model)}
 
-          {!renderCardContent &&
+          {!renderCardContent && (
             <React.Fragment>
               <View style={styles.cardHeaderContainer}>
                 <View style={styles.cardTitleContainer}>
-                  <Text style={[cardTitleTextStyle, styles.cardTitleText]}>{model.title}</Text>
+                  <Text style={[cardTitleTextStyle, styles.cardTitleText]}>
+                    {model.title}
+                  </Text>
                 </View>
-                <Text style={[cardSubtitleTextStyle, styles.cardSubtitleText]}>{model.subtitle}</Text>
+                <Text style={[cardSubtitleTextStyle, styles.cardSubtitleText]}>
+                  {model.subtitle}
+                </Text>
               </View>
               <View style={styles.cardContentContainer}>
-                <Text style={[cardContentTextStyle, styles.cardContentText]}>{model.description}</Text>
+                <Text style={[cardContentTextStyle, styles.cardContentText]}>
+                  {model.description}
+                </Text>
               </View>
               {model.tags && model.tags.length > 0 && (
                 <Tags items={model.tags} />
               )}
-            </React.Fragment>}
+            </React.Fragment>
+          )}
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 }
 
-export default withKanbanContext(Card);
+// Create a generic wrapper function that preserves the type
+function CardWithContext<T>(
+  props: CardExternalProps<T> & { model: CardModel<T>; hidden: boolean }
+) {
+  const WrappedCard = withKanbanContext(Card as any);
+  return React.createElement(WrappedCard, props);
+}
+
+export default CardWithContext;
 
 const styles = StyleSheet.create({
   container: {
-    borderColor: '#E3E3E3',
+    borderColor: "#E3E3E3",
     borderWidth: 1,
     borderRadius: 8,
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginBottom: 16,
-    elevation: 3
+    elevation: 3,
   },
   cardHeaderContainer: {
-    marginBottom: 16
+    marginBottom: 16,
   },
   cardTitleContainer: {
-    marginBottom: 8
+    marginBottom: 8,
   },
   cardTitleText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-  cardSubtitleText: {
-  },
+  cardSubtitleText: {},
   cardContentContainer: {
-    marginBottom: 16
+    marginBottom: 16,
   },
   cardContentText: {
-    fontWeight: 'bold'
-  }
+    fontWeight: "bold",
+  },
 });

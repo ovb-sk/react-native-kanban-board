@@ -1,10 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import { KanbanContextProvider } from './kanban-context.provider';
-import { KanbanBoardProps } from './kanban-board.component';
-import KanbanBoard from './kanban-board.component';
+import KanbanBoard, { KanbanBoardProps } from "./kanban-board.component";
+import { KanbanContextProvider } from "./kanban-context.provider";
 
-class KanbanBoardContainer extends React.Component<KanbanBoardProps> {
+class KanbanBoardContainer<T> extends React.Component<KanbanBoardProps<T>> {
   render() {
     return (
       <KanbanContextProvider>

@@ -1,5 +1,5 @@
 {
-  "name": "react-native-kanban-board",
+  "name": "@ovb/react-native-kanban-board",
   "version": "0.1.0",
   "description": "test",
   "main": "lib/commonjs/index",
@@ -31,7 +31,8 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prepack": "bob build",
     "release": "release-it",
-    "bootstrap": "pnpm i"
+    "bootstrap": "pnpm i",
+    "example": "cd example && expo start --ios"
   },
   "keywords": [
     "react-native",
