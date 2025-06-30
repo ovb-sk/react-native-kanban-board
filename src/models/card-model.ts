@@ -1,8 +1,8 @@
-import { View } from 'react-native';
-import { Rect } from './rect';
-import { Tag } from './tag';
+import { View } from "react-native";
+import { Rect } from "./rect";
+import { Tag } from "./tag";
 
-export class CardModel {
+export class CardModel<T> {
   private _ref: View | null = null;
   private _hidden: boolean = false;
   private _rect: Rect | undefined;
@@ -16,7 +16,7 @@ export class CardModel {
   subtitle: string;
   description: string | undefined;
   tags: Tag[];
-  item: any;
+  item: T;
   sortOrder: number;
 
   get ref(): View | null {
@@ -54,15 +54,16 @@ export class CardModel {
    * @param {*} item - The item associated with the card.
    * @param {number} sortOrder - The sort order of the card within its column.
    */
-  constructor(id: string | undefined,
+  constructor(
+    id: string | undefined,
     columnId: string,
     title: string,
     subtitle: string,
     description: string | undefined,
     tags: Tag[],
-    item: any,
-    sortOrder: number) {
-
+    item: T,
+    sortOrder: number
+  ) {
     this.id = id;
     this.columnId = columnId;
     this.title = title;
@@ -86,9 +87,21 @@ export class CardModel {
     this._ref.measure((_x, _y, width, height, pageX, pageY) => {
       this._rect = { x: pageX, y: pageY, width, height };
 
-      if (!this._isRenderedAndVisible && this._rect.x && this._rect.y && this._rect.width && this._rect.height) {
+      if (
+        !this._isRenderedAndVisible &&
+        this._rect.x &&
+        this._rect.y &&
+        this._rect.width &&
+        this._rect.height
+      ) {
         this.setIsRenderedAndVisible(true);
-      } else if (this._isRenderedAndVisible && !this._rect.x && !this._rect.y && !this._rect.width && !this._rect.height) {
+      } else if (
+        this._isRenderedAndVisible &&
+        !this._rect.x &&
+        !this._rect.y &&
+        !this._rect.width &&
+        !this._rect.height
+      ) {
         this.setIsRenderedAndVisible(false);
       }
 

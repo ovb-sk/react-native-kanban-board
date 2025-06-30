@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   FlatList,
   NativeScrollEvent,
@@ -6,19 +6,19 @@ import {
   StyleProp,
   StyleSheet,
   Text,
-  View,
   TextStyle,
-  ViewStyle
-} from 'react-native';
+  View,
+  ViewStyle,
+} from "react-native";
 
-import EmptyColumn from './empty-column.component';
-import { ColumnModel } from '../../models/column-model';
-import { CardModel } from '../../models/card-model';
-import { Badge } from './badge.component';
-import { BoardTools } from '../../utils/board-tools';
-import { BoardState } from '../../models/board-state';
-import { COLUMN_MARGIN } from '../../board-consts';
-import { KanbanContext } from '../kanban-context.provider';
+import { COLUMN_MARGIN } from "../../board-consts";
+import { BoardState } from "../../models/board-state";
+import { CardModel } from "../../models/card-model";
+import { ColumnModel } from "../../models/column-model";
+import { BoardTools } from "../../utils/board-tools";
+import { KanbanContext } from "../kanban-context.provider";
+import { Badge } from "./badge.component";
+import EmptyColumn from "./empty-column.component";
 
 export type ColumnExternalProps = {
   /**
@@ -37,82 +37,80 @@ export type ColumnExternalProps = {
    * Custom style for the column header title text.
    */
   columnHeaderTitleStyle?: StyleProp<TextStyle>;
-}
+};
 
-type Props = KanbanContext &
+type Props<T> = KanbanContext &
   ColumnExternalProps & {
-    boardState: BoardState;
+    boardState: BoardState<T>;
     column: ColumnModel;
-    renderCardItem: (item: CardModel) => JSX.Element;
+    renderCardItem: (item: CardModel<T>) => JSX.Element;
     isWithCountBadge: boolean;
     movingMode: boolean;
     singleDataColumnAvailable: boolean;
   };
 
-type State = {
-}
+type State = {};
 
-export class Column extends React.Component<Props, State> {
+export class Column<T> extends React.Component<Props<T>, State> {
   scrollingDown: boolean = false;
-  flatList: React.RefObject<FlatList<CardModel>> = React.createRef<FlatList<CardModel>>();
+  flatList: React.RefObject<FlatList<CardModel<T>>> =
+    React.createRef<FlatList<CardModel<T>>>();
   viewabilityConfig: any = {
     itemVisiblePercentThreshold: 1,
-    waitForInteraction: false
+    waitForInteraction: false,
   };
 
   setRefColumn = (ref: View | null) => {
     this.props.column.setRef(ref);
-  }
+  };
 
   measureColumn = () => {
     this.props.column.measure();
-  }
+  };
 
   scrollToOffset = (offset: number) => {
     this.flatList?.current?.scrollToOffset({ animated: true, offset });
-  }
+  };
 
   handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const {
-      column
-    } = this.props;
+    const { column } = this.props;
 
     const liveOffset = event.nativeEvent.contentOffset.y;
     this.scrollingDown = liveOffset > column.scrollOffset;
-  }
+  };
 
   endScrolling = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const {
-      column
-    } = this.props;
+    const { column } = this.props;
 
     const currentOffset = event.nativeEvent.contentOffset.y;
-    const scrollingDownEnded = this.scrollingDown && currentOffset >= column.scrollOffset;
-    const scrollingUpEnded = !this.scrollingDown && currentOffset <= column.scrollOffset;
+    const scrollingDownEnded =
+      this.scrollingDown && currentOffset >= column.scrollOffset;
+    const scrollingUpEnded =
+      !this.scrollingDown && currentOffset <= column.scrollOffset;
 
     if (scrollingDownEnded || scrollingUpEnded) {
       column.setScrollOffset(currentOffset);
       BoardTools.validateAndMeasureBoard(this.props.boardState);
     }
-  }
+  };
 
   onScrollEndDrag = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     this.endScrolling(event);
-  }
+  };
 
   onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     this.endScrolling(event);
-  }
+  };
 
   onContentSizeChange = (_: number, contentHeight: number) => {
     const { column } = this.props;
     column.setContentHeight(contentHeight);
-  }
+  };
 
   handleChangeVisibleItems = () => {
     const { column } = this.props;
     BoardTools.validateAndMeasureBoard(this.props.boardState, column);
-  }
+  };
 
   render = () => {
     const {
@@ -127,10 +125,12 @@ export class Column extends React.Component<Props, State> {
 
       renderEmptyColumn,
       columnHeaderContainerStyle,
-      columnHeaderTitleStyle
+      columnHeaderTitleStyle,
     } = this.props;
 
-    const items = boardState.columnCardsMap.has(column.id) ? boardState.columnCardsMap.get(column.id)! : [];
+    const items = boardState.columnCardsMap.has(column.id)
+      ? boardState.columnCardsMap.get(column.id)!
+      : [];
     const noOfItems = items.length;
 
     let columnContent;
@@ -145,24 +145,27 @@ export class Column extends React.Component<Props, State> {
           onScrollEndDrag={this.onScrollEndDrag}
           onViewableItemsChanged={this.handleChangeVisibleItems}
           viewabilityConfig={this.viewabilityConfig}
-          renderItem={item => (
-            <View key={item.item.id}
-              ref={ref => item.item.setRef(ref)}
-              onLayout={() => item.item.validateAndMeasure()}>
+          renderItem={(item) => (
+            <View
+              key={item.item.id}
+              ref={(ref) => item.item.setRef(ref)}
+              onLayout={() => item.item.validateAndMeasure()}
+            >
               {renderCardItem(item.item)}
             </View>
           )}
-          keyExtractor={item => item.id ?? ''}
+          keyExtractor={(item) => item.id ?? ""}
           scrollEnabled={!movingMode}
           onContentSizeChange={this.onContentSizeChange}
           showsVerticalScrollIndicator={false}
         />
       );
     } else {
-      columnContent = renderEmptyColumn ?
-        renderEmptyColumn(column) : (
-          <EmptyColumn />
-        );
+      columnContent = renderEmptyColumn ? (
+        renderEmptyColumn(column)
+      ) : (
+        <EmptyColumn />
+      );
     }
 
     return (
@@ -170,42 +173,48 @@ export class Column extends React.Component<Props, State> {
         ref={this.setRefColumn}
         onLayout={this.measureColumn}
         style={[
-          styles.columnContainer, {
+          styles.columnContainer,
+          {
             width: singleDataColumnAvailable ? oneColumnWidth : columnWidth,
-            marginRight: singleDataColumnAvailable ? 0 : COLUMN_MARGIN
-          }]}>
-        <View style={[styles.columnHeaderContainer, columnHeaderContainerStyle]}>
-          <Text style={[styles.columnHeaderTitle, columnHeaderTitleStyle]}>{column.title}</Text>
-          {isWithCountBadge &&
+            marginRight: singleDataColumnAvailable ? 0 : COLUMN_MARGIN,
+          },
+        ]}
+      >
+        <View
+          style={[styles.columnHeaderContainer, columnHeaderContainerStyle]}
+        >
+          <Text style={[styles.columnHeaderTitle, columnHeaderTitleStyle]}>
+            {column.title}
+          </Text>
+          {isWithCountBadge && (
             <View style={styles.columnHeaderRightContainer}>
               <Badge value={noOfItems} />
             </View>
-          }
+          )}
         </View>
 
         {columnContent}
       </View>
     );
-  }
+  };
 }
 
 export default Column;
 
 const styles = StyleSheet.create({
   columnContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 8,
-    padding: 8
+    padding: 8,
   },
   columnHeaderContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 24,
   },
   columnHeaderTitle: {
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
-  columnHeaderRightContainer: {
-  },
+  columnHeaderRightContainer: {},
 });

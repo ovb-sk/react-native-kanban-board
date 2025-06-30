@@ -1,8 +1,8 @@
-import React, { Component, ReactNode } from 'react';
-import { Dimensions, EmitterSubscription } from 'react-native';
+import React, { Component, ReactNode } from "react";
+import { Dimensions, EmitterSubscription } from "react-native";
 
-import { PADDING } from '../board-consts';
-import { isTablet } from '../utils/device-utils';
+import { PADDING } from "../board-consts";
+import { isTablet } from "../utils/device-utils";
 
 export type KanbanContext = {
   deviceWidth: number;
@@ -14,7 +14,7 @@ export type KanbanContext = {
 };
 
 function getKanbanContext(): KanbanContext {
-  const screenSize = Dimensions.get('window');
+  const screenSize = Dimensions.get("window");
 
   const deviceWidth = screenSize.width;
   const isLandscape = screenSize.width > screenSize.height;
@@ -40,14 +40,16 @@ function getKanbanContext(): KanbanContext {
     columnWidth: columnWidth,
     oneColumnWidth: oneColumnWidth,
     cardWidth: cardWidth,
-    displayedColumns: noOfColumns
+    displayedColumns: noOfColumns,
   };
 
   return deviceInfoContext;
 }
 
 const initialDeviceInfoContext = getKanbanContext();
-const DeviceInfoContext = React.createContext<KanbanContext>(initialDeviceInfoContext);
+const DeviceInfoContext = React.createContext<KanbanContext>(
+  initialDeviceInfoContext
+);
 
 type Props = {
   children: ReactNode;
@@ -58,7 +60,10 @@ export class KanbanContextProvider extends Component<Props, KanbanContext> {
   resizeSubscription: EmitterSubscription | null = null;
 
   componentDidMount() {
-    this.resizeSubscription = Dimensions.addEventListener('change', this.handleOrientationChange);
+    this.resizeSubscription = Dimensions.addEventListener(
+      "change",
+      this.handleOrientationChange
+    );
   }
 
   componentWillUnmount() {
@@ -83,7 +88,7 @@ export class KanbanContextProvider extends Component<Props, KanbanContext> {
 
 export const withKanbanContext = <P extends object>(
   WrappedComponent: React.ComponentType<P & KanbanContext>
-) => {
+): React.ComponentType<P> => {
   return class extends Component<P> {
     render() {
       return (
